@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Canto del Autana Dialogue Builder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=3.0">
+    <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">	
+    <style type="text/css">
+    	body {
+    		margin-top: 0;
+    		padding-top: 0;
+    	}
+    	.text-center {
+    		text-align: center;
+    	}
+    </style>
+    <script type="text/javascript" src="assets/js/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		var dialogues = [];
+		var dialoguesCounter = 0;
+		var imgRoot = "assets/img/";
+		var imgPrefix = "btn_";
+		var imgSuffix = "";
+		var imgExt = ".jpg";
+		var characterSelection = [
+			["none", "None"],
+			/*["maleiwa", "Maleiwa"],
+			["wanulu", "Wanulu"],
+			["yanomami", "Yanomami"],
+			["piaroa", "Piaroa"],
+			["guahibo", "Guahibo"],
+			["chiguire", "Chiguire"],
+			["yekuana", "Yekuana"],
+			["heseiyu", "Seiyu (male)"],
+			["sheseiyu", "Seiyu (female)"]*/
+			["kaito", "Kaito"],
+			["len", "Len"],
+			["luka", "Luka"],
+			["meiko", "Meiko"],
+			["miku", "Miku"],
+			["rin", "Rin"]
+		];
+		$(document).ready(function () {
+			/**
+			 * Sets the New Dialogue Box to 
+			 * its initial state.
+			 * @return 	void
+			 */
+			function resetDialogue () {
+				$('#dialoguecharacter').val('none');
+				$('#dialogueline1').val('');
+				$('#dialogueline2').val('');
+				$('#dialogueline3').val('');
+				$('#dialogueline4').val('');
+				$('#dialoguecharacterimg').attr("src", "");
+				$('#dialoguecharacter').focus();
+			}
+			/**
+			 * Sets a given selection box's values to
+			 * the ones given in the array.
+			 * @param 	id 			string specifiying the select-tag id
+			 * @param 	inputArray 	bidimensional array (value, text)
+			 * @return 	void
+			 */
+			function setSelection (id, inputArray) {
+				var i, strOption;
+				$('#'+id).empty();
+				for (i = 0; i < inputArray.length; i++) {
+					strOption = '<option value="'+inputArray[i][0]+'">'+inputArray[i][1]+'</option>';
+					$('#'+id).append(strOption);
+				}
+			}
+			/**
+			 * Adds the new dialogue box to the dialogues array and
+			 * also adds it to the visualizer.
+			 * @return 	void
+			 */
+			function addDialogue () {
+				var nDialogue = {
+					id: dialoguesCounter++,
+					character: $('#dialoguecharacter').val(),
+					line1: $('#dialogueline1').val(),
+					line2: $('#dialogueline2').val(),
+					line3: $('#dialogueline3').val(),
+					line4: $('#dialogueline4').val()
+				};
+				dialogues.push(nDialogue);
+				$.ajax({
+					url: 'dialoguetemplate.html',
+					type: 'GET',
+					dataType: 'html',
+					success: function (data) {
+						$('#dialoguespreview').append(data);
+						setDialogue(nDialogue);
+					}
+				});
+			}
+			/**
+			 * Sets the latest dialogue box using the given data.
+			 * @param 	data 	JSON containing dialogue's details
+			 * @param 	id 		string
+			 * @return 	void
+			 */
+			function setDialogue (data, id) {
+				if (id === undefined)
+					id = "";
+				$('#dialogue_'+id).attr("id", "dialogue_"+data.id);
+				$('#dialogueimage_'+id).attr("id", "dialogueimage_"+data.id);
+				$('#dialoguecharacter_'+id).attr("id", "dialoguecharacter_"+data.id);
+				$('#dialogueline1_'+id).attr("id", "dialogueline1_"+data.id);
+				$('#dialogueline2_'+id).attr("id", "dialogueline2_"+data.id);
+				$('#dialogueline3_'+id).attr("id", "dialogueline3_"+data.id);
+				$('#dialogueline4_'+id).attr("id", "dialogueline4_"+data.id);
+				$('#dialogueup_'+id).attr("id", "dialogueup_"+data.id);
+				$('#dialoguedown_'+id).attr("id", "dialoguedown_"+data.id);
+				if (data.character != "none") {
+					var imgUrl = imgRoot+imgPrefix+data.character+imgSuffix+imgExt;
+					$('#dialogueimage_'+data.id).attr('src', imgUrl);
+					$('#dialoguecharacter_'+data.id).text(data.character.toUpperCase()+":");
+				}
+				$('#dialogueline1_'+data.id).text(data.line1);
+				$('#dialogueline2_'+data.id).text(data.line2);
+				$('#dialogueline3_'+data.id).text(data.line3);
+				$('#dialogueline4_'+data.id).text(data.line4);
+				$('#dialogueup_'+data.id).unbind();
+			 	$('#dialoguedown_'+data.id).unbind();
+				$('#dialogueup_'+data.id).bind('click', function (e) {
+					var dialogueId = $('#dialogueup_'+data.id).attr("id").replace("dialogueup_", "");
+					moveDialogue(dialogueId, "up");
+				});
+				$('#dialoguedown_'+data.id).bind('click', function (e) {
+					var dialogueId = $('#dialoguedown_'+data.id).attr("id").replace("dialoguedown_", "");
+					moveDialogue(dialogueId, "down");
+				});
+			}
+			/**
+
+			 */
+			 function setDialogueTemp (id) {
+			 	data = {id:"temp"};
+			 	$('#dialogue_'+id).attr("id", "dialogue_"+data.id);
+				$('#dialogueimage_'+id).attr("id", "dialogueimage_"+data.id);
+				$('#dialoguecharacter_'+id).attr("id", "dialoguecharacter_"+data.id);
+				$('#dialogueline1_'+id).attr("id", "dialogueline1_"+data.id);
+				$('#dialogueline2_'+id).attr("id", "dialogueline2_"+data.id);
+				$('#dialogueline3_'+id).attr("id", "dialogueline3_"+data.id);
+				$('#dialogueline4_'+id).attr("id", "dialogueline4_"+data.id);
+				$('#dialogueup_'+id).attr("id", "dialogueup_"+data.id);
+				$('#dialoguedown_'+id).attr("id", "dialoguedown_"+data.id);
+			 }
+			/**
+			 * Gets the dialogue position in the JSON array, given its ID.
+			 * If not found, returns -1;
+			 * @param 	id 	string
+			 * @return 	int
+			 */
+			function getDialoguePosition (id) {
+				var i;
+				for (i = 0; i < dialogues.length; i++) {
+					if (dialogues[i].id == id)
+						return i;
+				}
+				return -1;
+			}
+			/**
+			 * Changes a dialogue's position in the dialogues' array
+			 * given its position and the direction (up or down).
+			 * @param 	position 	integer position in the array
+			 * @param 	direction 	string (up or down)
+			 * @return 	void
+			 */
+			function moveDialogue (id, direction) {
+				var position = getDialoguePosition(id);
+				var swapPos = position;
+				if (direction == "up" && position > 0)
+					swapPos--;
+				else if (direction == "down" && position < dialogues.length-1)
+					swapPos++;
+				var prevId = id;
+				var nextId = dialogues[swapPos].id;
+				/*swapJson = {
+					id: dialogues[swapPos].id,
+					character: dialogues[swapPos].character,
+					line1: dialogues[swapPos].line1,
+					line2: dialogues[swapPos].line2,
+					line3: dialogues[swapPos].line3,
+					line4: dialogues[swapPos].line4
+				};*/
+				dialogues[swapPos] = dialogues[position];
+				dialogues[position] = swapJson;
+								
+			}
+			/**
+			 * Deletes all the dialogues built so far.
+			 * @return 	void
+			 */
+			function dropDialogues () {
+				$('#dialoguespreview').empty();
+				dialogues = [];
+				dialoguesCounter = 0;
+				resetDialogue();
+			}
+			function rebuildDialogues () {
+				$('#dialoguespreview').empty();
+				var i;
+				for (i = 0; i < dialogues.length; i++) {
+					var nDialogue = dialogues[i];
+					$.ajax({
+						url: 'dialoguetemplate.html',
+						type: 'GET',
+						dataType: 'html',
+						success: function (data, i) {
+							console.log(nDialogue);
+							/*
+							$('#dialoguespreview').append(data);
+							setDialogue(nDialogue);*/
+						}
+					});	
+				}
+			}
+
+			$('#dialogueform').submit(function (e) {
+				e.preventDefault();
+				addDialogue();
+				resetDialogue();
+			});
+			$('#dialoguereset').click(function (e) {
+				resetDialogue();
+			});
+			$('#dialoguesdrop').click(function (e) {
+				cleanDialogues();
+			});
+			$('#dialoguecharacter').change(function (e) {
+				var imgUrl = ""
+				if (this.value != "none")
+					imgUrl = imgRoot+imgPrefix+this.value+imgSuffix+imgExt;
+				$('#dialoguecharacterimg').attr("src", imgUrl);
+			});
+			resetDialogue();
+			setSelection("dialoguecharacter", characterSelection);
+		});
+	</script>
+  </head>
+  <body>
+  	<p class="text-center"><img src="assets/img/logo.png" height="100"></p>
+  	<div class="container">
+	  	<div class="row">
+			<div class="col-md-4 sidebar-offcanvas">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h2 class="panel-title">New dialogue box</h2>
+					</div>
+					<div class="panel-body">
+						<form role="form" id="dialogueform">
+							<div class="form-group">
+								<label>Character</label>
+								<input type="hidden" >
+								<div class="row">
+									<div class="col-md-2">
+										<img style="clear:both;" id="dialoguecharacterimg" src="" width="32">
+									</div>
+									<div class="col-md-10 pull-right">
+										<select class="form-control" name="dialoguecharacter" id="dialoguecharacter">
+										</select>
+									</div>
+								</div>
+								<label>Message</label>
+								<input type="text" class="form-control" name="dialogueline1" id="dialogueline1" maxlength="35" placeholder="Line 1">
+								<input type="text" class="form-control" name="dialogueline2" id="dialogueline2" maxlength="35" placeholder="Line 2">
+								<input type="text" class="form-control" name="dialogueline3" id="dialogueline3" maxlength="35" placeholder="Line 3">
+								<input type="text" class="form-control" name="dialogueline4" id="dialogueline4" maxlength="35" placeholder="Line 4">
+							</div>
+							<button id="dialoguesubmit" type="submit" class="btn btn-success">Add</button>
+							<button id="dialoguereset" type="reset" class="btn btn-default">Reset</button>
+						</form>
+					</div>
+				</div>
+				
+			</div>
+			<div class="col-md-8">
+				<div class="panel panel-default"> 
+					<div class="panel-heading clearfix">
+						<h3 class="panel-title pull-left">Dialogue</h3>
+						<div class="btn-group pull-right">
+							<button id="dialoguesdrop" type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-trash"></span> delete</button> 
+							<button id="dialoguesdownload" type="button" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-cloud-download"></span> download</button>
+						</div>
+					</div>
+					<div class="panel-body" id="dialoguespreview">
+						<!--
+						<div class="well clearfix ">
+							<div class="col-md-2">
+								<img class="" src="assets/img/heseiyu.png" width="86">
+							</div>
+							<div class="col-md-7">
+								
+								<h4 class="">
+									<select class="form-control" name="dialoguecharacter" id="dialoguecharacter">
+										<option value="none">None</option>
+										<option value="maleiwa">Maleiwa</option>
+										<option value="wanulu">Wanulu</option>
+										<option value="yanomami">Yanomami</option>
+										<option value="piaroa">Piaroa</option>
+										<option value="guahibo">Guahibo</option>
+										<option value="chiguire">Chiguire</option>
+										<option value="yekuana">Yekuana</option>
+										<option value="heseiyu">Seiyu (male)</option>
+										<option value="sheseiyu">Seiyu (female)</option>
+									</select>
+								</h4>
+								<p class=""><input type="text" class="form-control" name="dialogueeditline1" id="dialogueeditline1" maxlength="35" placeholder="Line 1"></p>
+								<p class=""><input type="text" class="form-control" name="dialogueeditline2" id="dialogueeditline2" maxlength="35" placeholder="Line 1"></p>
+								<p class=""><input type="text" class="form-control" name="dialogueeditline3" id="dialogueeditline3" maxlength="35" placeholder="Line 1"></p>
+								<p class=""><input type="text" class="form-control" name="dialogueeditline4" id="dialogueeditline4" maxlength="35" placeholder="Line 1"></p>
+							</div>
+							<div class="col-md-3">
+								<p>
+									<div class="btn-group">
+										<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-arrow-up"></span></button>
+										<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-arrow-down"></span></button>
+									</div>
+								</p>
+								<p>
+									<div class="btn-group">
+										<button class="btn btn-primary">edit</button>
+										<button class="btn btn-default">cancel</button>
+									</div>
+								</p>
+								<p><button class="btn btn-danger ">delete</button></p>
+							</div>
+						</div>
+						-->
+
+					</div>
+				</div>				
+			</div>
+		</div>
+	</div>
+  </body>
+</html>
