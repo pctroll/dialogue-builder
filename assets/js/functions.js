@@ -10,15 +10,6 @@ var imgSuffix = "";
 var imgExt = ".jpg";
 var characterSelection = [
 	["none", "None"],
-	/*["maleiwa", "Maleiwa"],
-	["wanulu", "Wanulu"],
-	["yanomami", "Yanomami"],
-	["piaroa", "Piaroa"],
-	["guahibo", "Guahibo"],
-	["chiguire", "Chiguire"],
-	["yekuana", "Yekuana"],
-	["heseiyu", "Seiyu (male)"],
-	["sheseiyu", "Seiyu (female)"]*/
 	["kaito", "Kaito"],
 	["len", "Len"],
 	["luka", "Luka"],
@@ -127,6 +118,16 @@ $(document).ready(function () {
 		}
 			
 	}
+	
+	/**
+	 * Encodes a string to UTF-8
+	 * @param 	string 	input
+	 * @return 	string
+	 */
+	function encodeUtf8 (input) {
+		return unescape(encodeURIComponent(input));
+	}
+	
 	/**
 	 * Export the dialogues to a json file.
 	 * @return 	void
@@ -135,6 +136,7 @@ $(document).ready(function () {
 		
 		if (dialogues.length > 0) {
 			var content = JSON.stringify(dialogues);
+			content = encodeUtf8(content);
 			var blob = new Blob(
 				[content],{type:"text/plain;charset=utf-8"}
 			);
