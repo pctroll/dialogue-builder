@@ -196,7 +196,10 @@ $(document).ready(function () {
 		});
 	}
 	/**
-	 *
+	 * Assigns the new dialogue holder of the temporary data
+	 * given that dialogue's id
+	 * @param 	id 	string
+	 * @return 	void
 	 */
 	 function setDialogueTemp (id) {
 	 	data = {id:"temp"};
